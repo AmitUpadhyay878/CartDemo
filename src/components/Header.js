@@ -32,11 +32,11 @@ function Header() {
                   Home
                 </NavLink>
               </li>
-              <li>
+              <li class="text-white">
                 <NavLink
                   activeClassName="active"
                   to="/Cart"
-                  class="block py-2 pr-4 pl-3 text-white   md:p-0 dark:text-white"
+                  class="block py-2 pr-4 pl-3 md:p-0 dark:text-white"
                 >
                   Cart ({cart.length})&nbsp;&nbsp; ₹({total})
                 </NavLink>
