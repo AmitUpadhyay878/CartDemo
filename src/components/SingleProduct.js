@@ -1,4 +1,4 @@
-import React, { useContext, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { Cart } from "./Context";
@@ -13,6 +13,7 @@ const reducer = (state, action) => {
   // return state;
   switch (action.type) {
     case "INCREMENT":
+      console.log(state);
       return state + 1;
 
     case "DECREMENT":
@@ -31,19 +32,36 @@ const reducer = (state, action) => {
 export const SingleProduct = ({ prod, isCart = false }) => {
   const { cart, setCart, total } = useContext(Cart);
 
-  const [state, dispatch] = useReducer(reducer, prod.qty || initialState);
+  const [state, dispatch] = useReducer(reducer, prod.qty);
   //   const[isExist,setIsExist] = useState(false)
-  function changehandle(id) {
-    let data = cart.map((e) => {
-      // let price = e.price;
-      console.log("state in change hanlde", state);
-      if (e.id == id) {
-        return { ...e, qty: state };
-      } else {
-        return e;
-      }
-    });
-    setCart(data);
+  function changehandle(id, dec) {
+    if (dec) {
+      let data = cart.map((e) => {
+        // let price = e.price;
+        console.log("state in change hanlde", state);
+        if (e.id == id) {
+          if (e.qty == 1) {
+            return { ...e, qty: e.qty };
+          } else {
+            return { ...e, qty: e.qty - 1 };
+          }
+        } else {
+          return e;
+        }
+      });
+      setCart(data);
+    } else {
+      let data = cart.map((e) => {
+        // let price = e.price;
+        console.log("state in change hanlde", state);
+        if (e.id == id) {
+          return { ...e, qty: e.qty + 1 };
+        } else {
+          return e;
+        }
+      });
+      setCart(data);
+    }
   }
 
   const addToCart = (id) => {
@@ -65,17 +83,21 @@ export const SingleProduct = ({ prod, isCart = false }) => {
         return ert;
       });
       setCart(dataa);
-      localStorage.setItem("cart", JSON.stringify(dataa));
+      // localStorage.setItem("cart", JSON.stringify(dataa));
     } else {
       let addtocart = [...cart, { ...prod }];
       setCart(addtocart);
-      localStorage.setItem("cart", JSON.stringify(addtocart));
+      // localStorage.setItem("cart", JSON.stringify(addtocart));
     }
   };
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
+
   return (
     <div class="max-w-sm bg-amber-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700  m-10 float-left justify-evenly w-90">
       <NavLink to="/">
-        <img class="p-8 rounded-t-lg" src={prod.image} alt="product image" />
+        <img class="p-3 rounded-t-lg" src={prod.image} alt="product image" />
       </NavLink>
       <div class="px-5 pb-5">
         <NavLink to="/">
@@ -89,18 +111,19 @@ export const SingleProduct = ({ prod, isCart = false }) => {
             {/* {prod.price.substring(0,3)} */}
             {/* without multiplication with quantity  {prod.price}  */}
             {/* {Math.floor(prod.price * prod.qty)} */}
-            {Math.floor(prod.price * state)}
+            {Math.floor(prod.price)}
             {/* {prod.price * state} */}
           </span>
 
           {isCart && (
             <div>
-              <span class="font-bold text-white"> X 
-              {/* {prod.qty ? prod.qty : state} */}
-              {state}
-              </span>
+              <span class="font-bold text-white">
+                {" "}
+               <span className="font-bold text-red-800">x</span> {/* {prod.qty ? prod.qty : state} */}{" "}
+                <span class="font-bold text-black">{state}</span>
+              </span>{" "}
               <button
-                className="bg-sky-500/50 rounded-full text-center font-bold text-white  px-2 mx-2"
+                className="bg-sky-500/50 rounded-full text-center font-bold text-white px-2 mx-2"
                 onClick={() => {
                   dispatch({ type: "INCREMENT", payload: prod.qty });
                   changehandle(prod.id);
@@ -111,10 +134,10 @@ export const SingleProduct = ({ prod, isCart = false }) => {
               </button>
               <button
                 className="bg-red-500/50 rounded-full w-8 text-center font-bold text-white px-2 mx-2"
-                onClick={() => {dispatch({ type: "DECREMENT",payload: prod.qty })
-                changehandle(prod.id);
-              }}
-                
+                onClick={() => {
+                  dispatch({ type: "DECREMENT", payload: prod.qty });
+                  changehandle(prod.id, "dec");
+                }}
               >
                 -
               </button>
@@ -133,7 +156,7 @@ export const SingleProduct = ({ prod, isCart = false }) => {
               class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
               onClick={() => setCart(cart.filter((c) => c.id !== prod.id))}
             >
-              Remove From Cart
+              Remove
             </button>
           ) : (
             <button

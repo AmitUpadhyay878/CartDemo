@@ -18,9 +18,10 @@ const Context = ({children}) => {
 
     const[cart,setCart] = useState(localcheck())
     const[total,setTotal] =useState()
-    console.log(total)
-    useEffect(() => {setTotal(cart.reduce((accu,currElem)=>accu+Number(currElem.price*currElem.qty),0))}, [cart])
-               
+    //console.log(total)
+    useEffect(() => {setTotal(cart.reduce((accu,currElem)=>accu+Number(Math.ceil(currElem.price)*currElem.qty),0))}, [cart])
+
+    // console.log(setcart);
 
  return ( 
         <Cart.Provider value={{cart,setCart,total,setTotal}}>
